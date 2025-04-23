@@ -14,6 +14,9 @@ public class Snake {
 		//FIXME - set up the segments instance variable
 		deltaX = 0;
 		deltaY = 0;
+		segments = new LinkedList<BodySegment>();
+		BodySegment initialSegment = new BodySegment(0.5, 0.5, SEGMENT_SIZE);  // Starting at (0.5, 0.5)
+        segments.add(initialSegment); 
 	}
 	
 	public void changeDirection(int direction) {
@@ -38,13 +41,33 @@ public class Snake {
 	 */
 	public void move() {
 		//FIXME
+		BodySegment head = segments.getFirst();  // Get the head (first segment in the list)
+		double newHeadX = head.getX() + deltaX;  
+	    double newHeadY = head.getY() + deltaY; 
+        
+	    for(int i = segments.size() - 1; i > 0; i--) { 
+	    	BodySegment current = segments.get(i);
+	    	BodySegment previous = segments.get(i-1);
+	    	current.setX(previous.getX());
+	    	current.setY(previous.getY());
+	    
+	    }
+	    //	head.setX(newHeadX);
+	    //	head.setY(newHeadY);
+	    
+	    	segments.getFirst().setX(newHeadX);
+	    	segments.getFirst().setY(newHeadY);
+	
+	    
 	}
 	
 	/**
 	 * Draws the snake by drawing each segment
 	 */
 	public void draw() {
-		//FIXME
+		for (BodySegment segments : segments) {
+			segments.draw(); 
+		}
 	}
 	
 	/**
@@ -54,7 +77,16 @@ public class Snake {
 	 */
 	public boolean eatFood(Food f) {
 		//FIXME
-		return false;
+		BodySegment head = segments.getFirst();
+		double distance = Math.sqrt(Math.pow(f.getX() - head.getX(), 2) + (Math.pow(f.getY() - head.getY(), 2)));
+		
+		if(distance < SEGMENT_SIZE + Food.FOOD_SIZE) {
+			BodySegment tail = segments.getLast();
+			BodySegment newSegment = new BodySegment (tail.getX(), tail.getY(), SEGMENT_SIZE);
+			segments.add(newSegment);
+			return true;
+		}
+		return false; //food is not eaten
 	}
 	
 	/**
@@ -63,6 +95,13 @@ public class Snake {
 	 */
 	public boolean isInbounds() {
 		//FIXME
-		return true;
+		BodySegment head = segments.getFirst();
+		if(head.getX() < 0 || head.getX() > 1) {
+			return false;
+		}else if (head.getY() < 0 || head.getY() > 1) {
+			return false;
+		}
+		return true; 
+
 	}
 }
